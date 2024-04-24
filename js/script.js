@@ -1,31 +1,35 @@
-// document.addEventListener('DOMContentLoaded', () => {
-
 const generateButton = document.querySelector('#generateColors');
 const colorCountInput = document.querySelector('#colorCount');
 const savedColorSchemes = document.querySelector('#savedColorSchemes');
+const errorMessage = document.querySelector('#errorMessage');
 
 // GENERATE COLOR SCHEME
-generateButton.addEventListener('click', generateColorScheme);
-// Define function to generate random color scheme
-// Pull hex codes from api using number input by user
-function generateColorScheme() {
-  let count = colorCountInput.value;
+generateButton.addEventListener('click', () => {
+  // Define function to generate random color scheme
+  // Pull hex codes from api using number input by user
+  const count = parseInt(colorCountInput.value);
+
+  // Check if count is within the range of 2 to 49
+  if (count < 2 || count > 49 || isNaN(count)) {
+    errorMessage.textContent = 'Color count must be between 2 and 49'
+    return; // Exit the function early if the validation fails
+  }
+
   fetch(`https://random-flat-colors.vercel.app/api/random?count=${count}`)
     .then(response => response.json())
-    .then(colors => {
-      displayColors(colors.colors);
-    });
-}
+    .then(data => displayColors(data.colors));
+});
 
 // DISPLAY COLORS
 // Define function to display colors for color scheme generated
 // Include description input field and save option
-function displayColors(colors) {
+const displayColors = (colors) => {
+  errorMessage.textContent = ''; // Clear any previous error message
   const colorDisplay = document.querySelector('#colorDisplay');
   colorDisplay.innerHTML = '';  // Clear previous colors
 
   const colorElements = colors.map(color => {
-    let div = document.createElement('div');
+    const div = document.createElement('div');
     div.style.backgroundColor = color;
     div.classList.add('color');
     return div;
@@ -37,13 +41,11 @@ function displayColors(colors) {
   const descriptionInput = document.createElement('input');
   descriptionInput.type = 'text';
   descriptionInput.placeholder = 'Enter description';
-  
+
   // Save button
   const saveButton = document.createElement('button');
   saveButton.textContent = 'Save this scheme';
-  saveButton.onclick = function () {
-    saveColorScheme(colors);
-  };
+  saveButton.addEventListener('click', () => saveColorScheme(colors));
 
   colorDisplay.appendChild(descriptionInput);
   colorDisplay.appendChild(saveButton);
@@ -51,7 +53,7 @@ function displayColors(colors) {
 
 // SAVE COLOR SCHEME
 // Define function to save generated color scheme to the page if user desires
-function saveColorScheme(colors) {
+const saveColorScheme = (colors) => {
   const descriptionInput = document.querySelector('#colorDisplay input');
   const description = descriptionInput.value || '(No description)';
 
@@ -65,7 +67,7 @@ function saveColorScheme(colors) {
 
 // ADD COLOR SCHEME TO PAGE
 // Define function used for saving and loading from storage
-function addColorSchemeToPage(colorScheme) {
+const addColorSchemeToPage = (colorScheme) => {
   // Create card for the new color scheme
   const card = document.createElement('div');
   card.classList.add('color-scheme-card');
@@ -86,11 +88,11 @@ function addColorSchemeToPage(colorScheme) {
   // Add delete button
   const deleteButton = document.createElement('button');
   deleteButton.textContent = 'Delete';
-  deleteButton.onclick = function () {
+  deleteButton.addEventListener('click', () => {
     card.remove();
     // Update local storage 
     removeFromLocalStorage(colorScheme);
-  };
+  });
   card.appendChild(deleteButton);
 
   // Prepend the card to the saved color schemes section (so that it is listed first at the top
@@ -98,12 +100,12 @@ function addColorSchemeToPage(colorScheme) {
 }
 
 // LOAD SAVED + REMOVE WHEN DELETED
-function loadSavedColorSchemes() {
+const loadSavedColorSchemes = () => {
   const colorSchemes = JSON.parse(localStorage.getItem('colorSchemes')) || [];
   colorSchemes.forEach(addColorSchemeToPage);
 }
 
-function removeFromLocalStorage(colorSchemeToDelete) {
+const removeFromLocalStorage = (colorSchemeToDelete) => {
   let colorSchemes = JSON.parse(localStorage.getItem('colorSchemes')) || [];
   colorSchemes = colorSchemes.filter(cs => JSON.stringify(cs) !== JSON.stringify(colorSchemeToDelete));
   localStorage.setItem('colorSchemes', JSON.stringify(colorSchemes));
@@ -111,5 +113,3 @@ function removeFromLocalStorage(colorSchemeToDelete) {
 
 // Load any saved color schemes
 loadSavedColorSchemes();
-
-// });
