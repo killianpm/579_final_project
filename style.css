@@ -1,0 +1,39 @@
+#app {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.color {
+  width: 60px;
+  height: 60px;
+  display: inline-block;
+  margin: 5px;
+}
+
+#errorMessage {
+  color: red;
+}
+
+#savedColorSchemes .color {
+  width: 50px;
+  height: 50px;
+}
+
+.color-scheme-card {
+  border: 1px solid #000;
+  padding: 10px;
+  margin: 10px;
+  display: inline-block;
+}
+
+input[type=number] {
+  margin: 10px;
+}
+
+button {
+  margin: 10px;
+}
+
+input[type=text] {
+  margin-top: 10px;
+}
